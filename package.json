@@ -1,0 +1,16 @@
+{
+  "name": "proof-demo",
+  "type": "module",
+  "version": "1.0.0",
+  "dependencies": {
+    "@ethersproject/abi": "5.7.0",
+    "@semaphore-protocol/identity": "^3.10.0",
+    "@semaphore-protocol/proof": "^3.10.0",
+    "@zk-kit/incremental-merkle-tree": "^1.1.0",
+    "ethers": "5.7.2",
+    "node-fetch": "^3.3.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.4"
+  }
+}
