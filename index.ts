@@ -3,11 +3,19 @@ import type { FullProof, Proof } from "@semaphore-protocol/proof";
 import { generateProof, verifyProof } from "@semaphore-protocol/proof";
 import type { MerkleProof } from "@zk-kit/incremental-merkle-tree";
 import fetch from "node-fetch";
-import { ethers } from "ethers";
+import { BigNumber, BytesLike, ethers } from "ethers";
 
 const encode = (value: bigint): string => {
   return "0x" + value.toString(16).padStart(64, "0");
 };
+
+// Lifted from @semaphore-protocol/proof internals
+function hash(message: BytesLike | number | bigint): bigint {
+  message = BigNumber.from(message).toTwos(256).toHexString();
+  message = ethers.utils.zeroPad(message, 32);
+
+  return BigInt(ethers.utils.keccak256(message)) >> BigInt(8);
+}
 
 // Lifted from previous simulator implementation
 function getMerkleProof(inclusionProof): MerkleProof {
@@ -27,6 +35,7 @@ function getMerkleProof(inclusionProof): MerkleProof {
   } as MerkleProof;
 }
 
+// Lifted from new simulator implementation
 async function getFullProof(
   trapdoor: bigint,
   nullifier: bigint,
@@ -47,6 +56,7 @@ async function getFullProof(
   });
 }
 
+// Lifted from new simulator implementation
 async function verifySemaphoreProof(
   trapdoor: bigint,
   nullifier: bigint,
@@ -154,9 +164,9 @@ if (verification?.verified) {
     root: inclusionProof.root,
     nullifierHash: encode(BigInt(verification.fullProof.nullifierHash)),
     externalNullifierHash: encode(
-      BigInt(verification.fullProof.externalNullifier)
+      hash(BigInt(verification.fullProof.externalNullifier))
     ),
-    signalHash: encode(BigInt(verification.fullProof.signal)),
+    signalHash: encode(hash(BigInt(verification.fullProof.signal))),
     proof: decodeProof(verification.fullProof.proof),
   };
 
